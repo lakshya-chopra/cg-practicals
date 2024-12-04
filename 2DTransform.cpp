@@ -1,104 +1,173 @@
-#include<iostream>
-#include<graphics.h>
-#include<math.h>
+#include <iostream>
+#include <graphics.h>
+#include <math.h>
 #include <conio.h>
-#include <stdio.h>
-#include <unistd.h>
-
 using namespace std;
+
+void multiplyMatrix(int mat[3][3], int points[][1], int result[][1])
+{
+    for (int i = 0; i < 3; i++)
+    {
+        result[i][0] = 0;
+        for (int j = 0; j < 3; j++)
+        {
+            result[i][0] += mat[i][j] * points[j][0];
+        }
+    }
+}
+
+void drawRectangle(int x1, int y1, int x2, int y2)
+{
+    rectangle(x1, y1, x2, y2);
+}
+
 int main()
 {
-    int gd=DETECT,gm,s;
-    initgraph(&gd,&gm,(char*)"");
-    cout<<"1.Translation\n2.Rotation\n3.Scaling\n4.Reflection\n5.Shearing   "<<endl;
-    cout<<"Selection:";
-    cin>>s;
-    switch(s)
+    int gd = DETECT, gm;
+    initgraph(&gd, &gm, (char *)"");
+
+    cout << "2D Transformations using Homogeneous Coordinates\n";
+    cout << "1. Translation\n2. Rotation\n3. Scaling\n4. Reflection\n5. Shearing\n";
+    cout << "Selection: ";
+    int s;
+    cin >> s;
+
+    int x1 = 200, y1 = 150, x2 = 300, y2 = 250;
+    int points[3][1] = {{x1}, {y1}, {1}};
+    int result[3][1];
+    int mat[3][3];
+
+    switch (s)
+    {
+    case 1:
+    {
+        int tx, ty;
+        cout << "Enter translation values (tx, ty): ";
+        cin >> tx >> ty;
+        mat[0][0] = 1;
+        mat[0][1] = 0;
+        mat[0][2] = tx;
+        mat[1][0] = 0;
+        mat[1][1] = 1;
+        mat[1][2] = ty;
+        mat[2][0] = 0;
+        mat[2][1] = 0;
+        mat[2][2] = 1;
+        multiplyMatrix(mat, points, result);
+        setcolor(3);
+        drawRectangle(x1, y1, x2, y2);
+        setcolor(4);
+        drawRectangle(result[0][0], result[1][0], x2 + tx, y2 + ty);
+        getch();
+        break;
+    }
+    case 2:
+    {
+        int angle;
+        cout << "Enter angle of rotation: ";
+        cin >> angle;
+        angle = (angle * 3.14) / 180; // Convert angle to radians
+        mat[0][0] = cos(angle);
+        mat[0][1] = -sin(angle);
+        mat[0][2] = 0;
+        mat[1][0] = sin(angle);
+        mat[1][1] = cos(angle);
+        mat[1][2] = 0;
+        mat[2][0] = 0;
+        mat[2][1] = 0;
+        mat[2][2] = 1;
+        multiplyMatrix(mat, points, result);
+        setcolor(3);
+        drawRectangle(x1, y1, x2, y2);
+        setcolor(2);
+        drawRectangle(result[0][0], result[1][0], x2, y2);
+        getch();
+        break;
+    }
+    case 3:
+    {
+        int sx, sy;
+        cout << "Enter scaling factors (sx, sy): ";
+        cin >> sx >> sy;
+        mat[0][0] = sx;
+        mat[0][1] = 0;
+        mat[0][2] = 0;
+        mat[1][0] = 0;
+        mat[1][1] = sy;
+        mat[1][2] = 0;
+        mat[2][0] = 0;
+        mat[2][1] = 0;
+        mat[2][2] = 1;
+        multiplyMatrix(mat, points, result);
+        setcolor(3);
+        drawRectangle(x1, y1, x2, y2);
+        setcolor(10);
+        drawRectangle(result[0][0], result[1][0], x2 * sx, y2 * sy);
+        getch();
+        break;
+    }
+    case 4:
+    {
+        int choice;
+        cout << "Enter reflection choice (1 for horizontal, 2 for vertical): ";
+        cin >> choice;
+        if (choice == 1)
         {
-        case 1:
-            {   int x1=200,y1=150,x2=300,y2=250;
-                int tx=50,ty=50;
-                cout<<"Rectangle before translation"<<endl;
-                setcolor(3);
-                rectangle(x1,y1,x2,y2);
-                setcolor(4);
-                cout<<"Rectangle after translation"<<endl;
-                rectangle(x1+tx,y1+ty,x2+tx,y2+ty);
-                getch();
-                break;
-            }
-        case 2:
-            {  long x1=200,y1=200,x2=300,y2=300;
-                double a;
-                cout<<"Rectangle with rotation"<<endl;
-                setcolor(3);
-                rectangle(x1,y1,x2,y2);
-                cout<<"Angle of rotation:";
-                cin>>a;
-                a=(a*3.14)/180;
-                long xr=x1+((x2-x1)*cos(a)-(y2-y1)*sin(a));
-                long yr=y1+((x2-x1)*sin(a)+(y2-y1)*cos(a));
-                setcolor(2);
-                rectangle(x1,y1,xr,yr);
-                sleep(5);
-                getch();
-                break;
-}
-        case 3:
-            {
-                int x1=30,y1=30,x2=70,y2=70,y=2,x=2;
-                cout<<"Before scaling"<<endl;
-                setcolor(3);
-                rectangle(x1,y1,x2,y2);
-                cout<<"After scaling"<<endl;
-                setcolor(10);
-                rectangle(x1*x,y1*y,x2*x,y2*y);
-                getch();
-                break;
-}
-        case 4:
-            {
-                 int x1=200,y1=300,x2=500,y2=300,x3=350,y3=400;
-                 cout<<"triangle before reflection"<<endl;
-                 setcolor(3);
-                 line(x1,y1,x2,y2);
-                 line(x1,y1,x3,y3);
-                 line(x2,y2,x3,y3);
-cout<<"triangle after reflection"<<endl;
-                 setcolor(5);
-                 line(x1,-y1+500,x2,-y2+500);
-                 line(x1,-y1+500,x3,-y3+500);
-                 line(x2,-y2+500,x3,-y3+500);
-                 getch();
-                 break;
-}
-        case 5:
-        {
-  int x1=400,y1=100,x2=600,y2=100,x3=400,y3=200,x4=600,y4=200,shx=2;
-             cout<<"Before shearing of rectangle"<<endl;
-             setcolor(3);
-             line(x1,y1,x2,y2);
-             line(x1,y1,x3,y3);
-             line(x3,y3,x4,y4);
-             line(x2,y2,x4,y4);
-             cout<<"After shearing of rectangle"<<endl;
-             x1=x1+shx*y1;
-             x2=x2+shx*y2;
-             x3=x3+shx*y3;
-             x4=x4+shx*y4;
-             setcolor(13);
-             line(x1,y1,x2,y2);
-             line(x1,y1,x3,y3);
-             line(x3,y3,x4,y4);
-             line(x2,y2,x4,y4);
-getch();
-}
-default:
-          {
-            cout<<"Invalid Selection"<<endl;
-            break;
-          }
+            mat[0][0] = 1;
+            mat[0][1] = 0;
+            mat[0][2] = 0;
+            mat[1][0] = 0;
+            mat[1][1] = -1;
+            mat[1][2] = 0;
+            mat[2][0] = 0;
+            mat[2][1] = 0;
+            mat[2][2] = 1;
         }
-closegraph();
+        else
+        {
+            mat[0][0] = -1;
+            mat[0][1] = 0;
+            mat[0][2] = 0;
+            mat[1][0] = 0;
+            mat[1][1] = 1;
+            mat[1][2] = 0;
+            mat[2][0] = 0;
+            mat[2][1] = 0;
+            mat[2][2] = 1;
+        }
+        multiplyMatrix(mat, points, result);
+        setcolor(3);
+        drawRectangle(x1, y1, x2, y2);
+        setcolor(5);
+        drawRectangle(result[0][0], result[1][0], x2, y2);
+        getch();
+        break;
+    }
+    case 5:
+    {
+        int shx, shy;
+        cout << "Enter shearing factors (shx, shy): ";
+        cin >> shx >> shy;
+        mat[0][0] = 1;
+        mat[0][1] = shx;
+        mat[0][2] = 0;
+        mat[1][0] = shy;
+        mat[1][1] = 1;
+        mat[1][2] = 0;
+        mat[2][0] = 0;
+        mat[2][1] = 0;
+        mat[2][2] = 1;
+        multiplyMatrix(mat, points, result);
+        setcolor(3);
+        drawRectangle(x1, y1, x2, y2);
+        setcolor(13);
+        drawRectangle(result[0][0], result[1][0], x2 + shx, y2 + shy);
+        getch();
+        break;
+    }
+    default:
+        break;
+    }
+    closegraph();
     return 0;
 }
